@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Card Deck Simulator</title>
+    <!-- In html and xml we can add comments using less than, eclamation and two dashes. The commented section ends when it reaches two dashes and a greater than sign -->
+    <!-- This line adds the styles for bootstrap version v5.3.8 to the page -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- here we will add any of our styles to change the look of our html code -->
+    <style>
+        /* we can only add comments using forward slash and star inside a style tag or css file */
+
+        /* this rule looks for a div element with a class of card and applied a background colour,
+            sets the div to allow other non-blocking elements to come after it,
+            set's its width, and
+            adds a gap between it and other elements around it */
+        div.card {
+            background-color: white;
+            display: inline-block;
+            width: 100px;
+            margin: 1em;
+        }
+
+        /* this rule only applies to divs with a class of card and a class of either clubs or spades
+            it sets the text and border of the card to black */
+        div.card.clubs,
+        div.card.spades {
+            border-color: solid 1px black;
+            color: black;
+        }
+
+        /* this rule only applies to divs with a class of card and a class of either diamonds or hearts
+            it sets the text and border of the card to black */
+        div.card.hearts,
+        div.card.diamonds {
+            border-color: solid 1px red;
+            color: red;
+        }
+
+        /* this rule applies to both the top and bottom text of the card.
+            it only sets a padding to keep a gap between the text and the edge of the element
+            1em is one line of text */
+        div.card div.top,
+        div.card div.bottom {
+            padding: 1em;
+        }
+
+        /* sets the top text element to have its text on the left */
+        div.card div.top {
+            text-align: left;
+        }
+
+        /* sets the bottom text element to have its text on the right */
+        div.card div.bottom {
+            text-align: right;
+        }
+
+        /* centres the text in the middle element and adds a 30 pixel gap between the suit symbol and the top and bottom text elements
+            also sets the font to twice the normal size */
+        div.card div.middle {
+            text-align: center;
+            font-size: 2em;
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+    </style>
+  </head>
+  <body>
+
+    <!-- container makes our page have a set width and centres the content https://getbootstrap.com/docs/5.3/layout/containers/ -->
+    <div class="container">
+        <!-- Content here -->
+        <h1>Card Deck Simulator</h1>
+        <!-- rows and columns allow us to set the width of our content and space things out nicely https://getbootstrap.com/docs/5.3/layout/grid/ -->
+        <div class="row">
+            <div class="col-4">
+                <!-- This column will be 4/12th of the width -->
+                <h2>Deck</h2>
+                <div id="deck">
+                </div>
+                <div class="btn-group" role="group" aria-label="Deck Actions">
+                    <button id="DeckShuffleButton" type="button" class="btn btn-primary">Shuffle</button>
+                    <button id="DeckDrawButton" type="button" class="btn btn-primary">Draw</button>
+                </div>
+            </div>
+            <div class="col">
+                <!-- This column will take up the rest of the width -->
+                <h2>Hand</h2>
+                <!-- a div is a box that can help organise our elements -->
+                <div id="hand">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- This line adds the javascript code for bootstrap version v5.3.8 to the page -->
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <!-- This line adds the javascript code for jquery version v4.0.0 to the page -->
+    <script src="js/jquery-4.0.0.min.js"></script>
+    <!-- this line adds my deck javascript code -->
+    <script src="js/deck.js"></script>
+    <script>
+        //In a script tag we can add our javascript code.
+        //texts after two forward slashes are comments and will not be run.
+
+        /*
+            You can put multiple lines into a commented section by putting a forward slash and a star.
+
+            The commented section continues until it finds a star and forward slash
+        */
+
+        //This line checks if the browser is set to light or dark mode and then sets the styles for the page to match that scheme.
+        //This only runs once, so if the computer theme changes at some point the page will not change to match. It only sets itself when the page first loads.
+        document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+
+
+
+
+        //we can add our code here:
+        
+        //const are variables that cannot be set again after first being set
+        const deckShuffleButton = $('#DeckShuffleButton'); //jquery element object for the deck shuffle button
+        const deckDrawButton = $('#DeckDrawButton'); //jquery element object for the deck draw card button
+        const deckDiv = $('#deck');
+        const handDiv = $('#hand');
+
+        //this adds the shuffleDeck function as the event handler for when a user clicks the shuffle button
+        deckShuffleButton.click(shuffleDeck);
+        //this adds the drawCard function as the event handler for when a user clicks the draw button
+        deckDrawButton.click(drawCard);
+
+        const deck = new Deck(); //this code creates a new deck of cards with 52 cards in it
+        const hand = []; //this array will hold all the cards that we have drawn from the deck so that we can use them again later
+
+        // this logs the top card to the developer console (press f12 in chrome or edge)
+        console.log(deck.peek().toShortName());
+
+        deck.shuffle(); //this shuffles our deck into a random order
+
+        // this logs the new top card to the developer console (press f12 in chrome or edge)
+        console.log(deck.peek().toShortName());
+
+        //shuffles the cards in the deck
+        function shuffleDeck(event) {
+            deck.shuffle();
+        }
+
+        //draws the top card off the deck and adds it to the hand
+        function drawCard(event) {
+            //draw the top card
+            const drawnCard = deck.draw();
+
+            if (!drawnCard)
+                return; //no card was returned so the deck must be empty
+
+            //add the card to our hand
+            hand.push(drawnCard);
+
+            //generate the html for the card
+            const cardElement = generateCardHtml(drawnCard);
+
+            //this line adds the card's html code to the html document inside the hand div element
+            handDiv.append(cardElement);
+        }
+ 
+        //Returns the clicked card from the hand to the deck.
+        function returnCard(event) {
+
+            const cardDiv = $(event.target);
+
+            cardDiv.remove();
+
+            for (let i = 0; i < handDiv.length; i++) {
+                  
+                if (cardDiv.id == hand[i].toShortName()) {
+                    deck.addToTop(hand.splice(i, 1)); 
+                }
+            } 
+        }
+        
+        //this function generates a html element for a card that we can add to the html document
+        //this code should be generic enough that it can be used anywhere
+        function generateCardHtml(card) {
+            //this creates a new div that is not yet on the document
+            const cardDiv = $('<div class="card"><div class="top"></div><div class="middle"></div><div class="bottom"></div></div>');
+
+            //here we will add a class to the div based on the suit tha card is from
+            switch (card.suit) {
+                case Card.SUIT_CLUBS: cardDiv.addClass('clubs'); break;
+                case Card.SUIT_HEARTS: cardDiv.addClass('hearts'); break;
+                case Card.SUIT_DIAMONDS: cardDiv.addClass('diamonds'); break;
+                case Card.SUIT_SPADES: cardDiv.addClass('spades'); break;
+            }
+
+            //here we are going to add soime text to the html based on the values in the card object
+            cardDiv.find('.top').text(card.number.name);
+            cardDiv.find('.bottom').text(card.number.name);
+            cardDiv.find('.middle').text(card.suit);
+
+            cardDiv.attr('id', card.number.name + card.suit);
+
+            //Triggers the returnCard event handler.
+            cardDiv.click(returnCard);
+
+            //return the card html object to be used later
+            return cardDiv;
+        }
+    </script>
+  </body>
+</html>
