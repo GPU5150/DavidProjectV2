@@ -172,9 +172,11 @@
             cardDiv.remove();
 
             for (let i = 0; i < handDiv.length; i++) {
-                  
+                //Make sure this check matches the value and attribute name set in generateCardHtml function.
                 if (cardDiv.id == hand[i].toShortName()) {
                     deck.addToTop(hand.splice(i, 1)); 
+                    //add a break here or it will keep searching for other cards with the same id
+                    //break;
                 }
             } 
         }
@@ -198,6 +200,8 @@
             cardDiv.find('.bottom').text(card.number.name);
             cardDiv.find('.middle').text(card.suit);
 
+            //this could be a problem if there are two cards with the same value. Maybe change to another attribute like data-card-value
+            //Also need to change value to card.toShortName() so that it matches the code in return card.
             cardDiv.attr('id', card.number.name + card.suit);
 
             //Triggers the returnCard event handler.
