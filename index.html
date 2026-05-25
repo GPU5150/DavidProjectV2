@@ -173,8 +173,9 @@
 
             for (let i = 0; i < handDiv.length; i++) {
                   
-                if (cardDiv.id == hand[i].toShortName()) {
+                if (cardDiv.dataset.cardValue == hand[i].toShortName()) {
                     deck.addToTop(hand.splice(i, 1)); 
+                    break;
                 }
             } 
         }
@@ -198,7 +199,7 @@
             cardDiv.find('.bottom').text(card.number.name);
             cardDiv.find('.middle').text(card.suit);
 
-            cardDiv.attr('id', card.number.name + card.suit);
+            cardDiv.attr('data-card-value', card.toShortName());
 
             //Triggers the returnCard event handler.
             cardDiv.click(returnCard);
